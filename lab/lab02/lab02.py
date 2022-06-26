@@ -14,7 +14,7 @@ def lambda_curry2(func):
     3
     """
     "*** YOUR CODE HERE ***"
-    return ______
+    return lambda x : lambda y : func(x,y)
 
 
 def lambda_curry2_syntax_check():
@@ -56,6 +56,15 @@ def count_cond(condition):
     8
     """
     "*** YOUR CODE HERE ***"
+    def judge(n):
+        i = 1
+        count = 0 
+        while(i <= n):
+            if(condition(n,i)):
+                count += 1
+            i+=1
+        return count
+    return judge
 
 
 def composer(f, g):
