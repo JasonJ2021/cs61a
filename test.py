@@ -1,71 +1,118 @@
-def count_stair_ways(n):
-    """Returns the number of ways to climb up a flight of
-    n stairs, moving either 1 step or 2 steps at a time.
-    >>> count_stair_ways(4)
-    5
+from cProfile import label
+from pydoc import Helper
+
+
+def my_map(fn, seq):
+    """Applies fn onto each element in seq and returns a list.
+    >>> my_map(lambda x: x*x, [1, 2, 3])
+    [1, 4, 9]
     """
     "*** YOUR CODE HERE ***"
-    if(n < 0):
-        return 0
-    if(n == 0 ):
-        return 1
-    return count_stair_ways(n - 1) + count_stair_ways(n - 2)
+    return [fn(x) for x in seq]
+ 
+def my_filter(pred, seq):
+    """Keeps elements in seq only if they satisfy pred.
+    >>> my_filter(lambda x: x % 2 == 0, [1, 2, 3, 4])  # new list has only even-valued elements
+    [2, 4]
+    """
+    "*** YOUR CODE HERE ***"
+    return [x for x in seq if pred(x)]
 
-def count_k(n, k):
-    """ Counts the number of paths up a flight of n stairs
-    when taking up to and including k steps at a time.
-    >>> count_k(3, 3) # 3, 2 + 1, 1 + 2, 1 + 1 + 1
+def my_reduce(combiner, seq):
+    """Combines elements in seq using combiner.
+    seq will have at least one element.
+    >>> my_reduce(lambda x, y: x + y, [1, 2, 3, 4])  # 1 + 2 + 3 + 4
+    10
+    >>> my_reduce(lambda x, y: x * y, [1, 2, 3, 4])  # 1 * 2 * 3 * 4
+    24
+    >>> my_reduce(lambda x, y: x * y, [4])
     4
-    >>> count_k(4, 4)
+    >>> my_reduce(lambda x, y: x + 2 * y, [1, 2, 3]) # (1 + 2 * 2) + 2 * 3
+    11
+    """
+    "*** YOUR CODE HERE ***"
+    if(len(seq) == 2):
+        return combiner(seq[0] , seq[1])
+    if(len(seq) == 1):
+        return seq[0]
+    return combiner(combiner(seq[0],seq[1]),my_reduce(combiner,seq[2:]))
+
+def count_palindromes(L):
+    """The number of palindromic words in the sequence of strings
+    L (ignoring case).
+
+    >>> count_palindromes(("Acme", "Madam", "Pivot", "Pip"))
+    2
+    """
+    return len(my_filter(helper ,L))
+
+
+def helper(s):
+    for i in range(len(s)//2):
+        if(s[i].lower() != s[len(s) - i - 1 ].lower()):
+            return False
+    return True
+
+def sum_tree(t):
+    """
+    Add all elements in a tree.
+    >>> t = tree(4, [tree(2, [tree(3)]), tree(6)])
+    >>> sum_tree(t)
+    15
+    """
+    temp = label(t)
+    for b in branches(t):
+        temp += sum_tree(b)
+
+    return sum([label(t)] + [sum_tree(b) for b in branches(t)])
+
+
+
+def tree(label, branches=[]):
+	return [label] + list(branches)
+
+def label(tree):
+	return tree[0]
+
+def branches(tree):
+	return tree[1:]
+
+def is_leaf(tree):
+	return len(branches(tree)) == 0
+
+def hailstone_tree(n, h):
+    """Generates a tree of hailstone numbers that will reach N, with height H.
+    >>> print_tree(hailstone_tree(1, 0))
+    1
+    >>> print_tree(hailstone_tree(1, 4))
+    1
+        2
+            4
+                8
+                    16
+    >>> print_tree(hailstone_tree(8, 3))
     8
-    >>> count_k(10, 3)
-    274
-    >>> count_k(300, 1) # Only one step at a time
-    1
+        16
+            32
+                64
+            5
+                10
     """
-    if(n < 0):
-        return 0 
-    if(n == 0):
-        return 1
-    result = 0
-    if(k < 0):
-        print("ERROR!")
-    for i in range(1,k + 1):
-        result += count_k(n-i , k)
-    return result
+    if h == 0:
+        return tree(n)
+    branches = [hailstone_tree(2*n , h - 1)]
+    if (n  - 1 ) % 3  == 0 and ((n - 1 ) // 3 ) % 2  :
+        branches += [hailstone_tree( (n - 1 ) // 3, h - 1 )]
+    return tree(n, branches)
 
-def even_weighted(s):
-    """
-    >>> x = [1, 2, 3, 4, 5, 6]
-    >>> even_weighted(x)
-    [0, 6, 20]
-    """
-    return  [s[i]*i for i in range(len(s)) if i % 2 == 0]
+def print_tree(t):
+    def helper(i, t):
+        print("    " * i + str(label(t)))
+        for b in branches(t):
+            helper(i + 1, b)
+    helper(0, t)
 
-def mult(list):
-    result = 1
-    for i in list:
-        result *= i
-    return result
 
-def max_product(s):
-    """Return the maximum product that can be formed using
-    non-consecutive elements of s.
-    >>> max_product([10,3,1,9,2]) # 10 * 9
-    90
-    >>> max_product([5,10,5,10,5]) # 5 * 5 * 5
-    125
-    >>> max_product([])
-    1
-    """
-    list = [[s[j:len(s):i] for j in range(0 , len(s)) if j + i <len(s)] for i in range(2,len(s))] 
-    result = 0
-    # for i in range(len(list)):
-    #     print(list[])
-    if(len(list) == 0) :
-        return 1
-    for i in range(len(list)):
-        for j in range(len(list[i])):
-            result = max(result , mult(list[i][j]))
-    
-    return result
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
