@@ -1,33 +1,27 @@
-def is_prime(n):
-    """Returns True if n is a prime number and False otherwise.
-    >>> is_prime(2)
-    True
-    >>> is_prime(16)
-    False
-    >>> is_prime(521)
-    True
+class LinkedList:
+    empty = ()
+    def __init__(self,value , next):
+        self.value = value 
+        self.next = next
+    
+    def __repr__(self) :
+        if(self.next):
+            rest_repr = ',' + repr(self.next)
+        else:
+            rest_repr = ''
+        return "LinkedList(" + repr(self.value) + rest_repr + ")"
+
+def filter_link(f, ll):
+    """Return a Link that contains only the elements x of Link LL
+    for which f(x) is a true value.
+    >>> is_odd = lambda x: x % 2 == 1
+    >>> filter_link(is_odd, range_link(3, 6))
+    Link(3, Link(5))
     """
-    def helper(i):
-        if i > (n ** 0.5): # Could replace with i == n
-            return True
-        elif n % i == 0:
-            return False
-        return helper(i + 1)
-    return helper(2)
-
-def primes_gen(n):
-    """Generates primes in decreasing order.
-    >>> pg = primes_gen(7)
-    >>> list(pg)
-    [7, 5, 3, 2]
-    """
-    if n == 1:
-        return 1
-    if is_prime(n):
-        yield n
-    yield from primes_gen(n - 1)
-
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+    if(ll == Link.empty):
+        return ()
+    if(f(ll.first)):
+        return Link(ll.next , filter_link(f,ll.rest))
+    else :
+        return filter_link(f,ll.rest)
+    
